@@ -1,0 +1,25 @@
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Generated build/runtime data
+runtime/
+work/
+build/
+dist/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Editor and operating-system files
+.vscode/
+.idea/
+*.user
+*.suo
+Thumbs.db
+Desktop.ini
+

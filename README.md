@@ -1,2 +1,45 @@
-# toolschest
-Tool Chest is an all-in-one utility suite for screenshot OCR, file cleanup, LAN sharing, content extraction, and photo organization. Currently, only the Windows version is available; the Android is in development, and features are being continuously expanded.
+# 工具宝匣
+
+面向 Windows 的本地工具合集。主程序使用系统自带的 .NET Framework WinForms，可直接编译为独立 EXE；不要求安装 .NET SDK。
+
+## 启动
+
+推荐双击 `outputs\启动工具宝匣.cmd`，它会隐藏 PowerShell 窗口并加载主程序；也可以在 PowerShell 中运行：
+
+```powershell
+.\run.ps1
+```
+
+`build.ps1` 会生成 `outputs\工具宝匣.exe`。如果 Windows 的应用程序控制策略阻止运行新生成的未签名 EXE，请使用上述 CMD/`run.ps1` 源码加载入口，功能相同。当前电脑的 Windows Script Host 被策略禁用，因此不推荐 VBS 入口。
+
+## 已实现
+
+- 无左侧栏的工具主页，按功能分组；置顶工具进入“常用工具”
+- 仅主页显示可折叠说明栏；选中工具后显示功能、使用说明和置顶键
+- 设置页：字体大小、浅色/深色/跟随系统、界面缩放、简体中文/繁體中文/English、截图时默认隐藏客户端
+- 图片应用：合并截图识字与图片搜索；截图时只最小化客户端并保留任务栏图标
+- 截图完成后的右键菜单固定为“复制识别、搜索图片、保存本地、退出截图”
+- 空文件夹、空文件和重复文件扫描；清理操作只移入 Windows 回收站
+- 局域网 FTP：共享目录、匿名/账号模式、上传权限、启动/停止
+- 文章提炼：清洗噪声、识别六类技术体裁，长文输出一句话、核心要点和可追溯完整摘要
+- 视频转脚本：逐字稿、精简文稿和 SRT
+- 媒体分类：照片、GIF 动图、视频，支持复制或移动及重名编号
+- 照片智能整理：六类预览、来源推断、后期软件识别、规则化命名和安全复制
+
+## 增强组件
+
+FTP 和视频转写组件已安装到项目的 `.venv`。迁移到另一台电脑后，可运行：
+
+```powershell
+.\install-enhancements.ps1
+```
+
+视频转写首次运行会下载 `faster-whisper` 的 small 模型。Tesseract OCR运行时及`chi_sim`、`eng`语言数据已经内嵌到`outputs\工具宝匣.exe`，首次识字时自动释放，无需安装脚本、管理员权限或系统PATH。
+
+## 安全约定
+
+- 不提供永久删除按钮。
+- 文件清理统一调用 Windows 回收站。
+- 照片智能整理默认复制到分类文件夹，不删除原文件。
+- 媒体整理默认选择“复制”，只有用户主动选择时才移动。
+
