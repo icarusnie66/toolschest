@@ -70,7 +70,7 @@ namespace MuxiaToolbox
         static readonly Dictionary<string,string> English = new Dictionary<string,string> {
             {"图片应用","Image tools"},{"文件清理","File cleanup"},{"共享与提取","Share & extract"},{"照片整理","Photo organizer"},
             {"截图识字与搜索","Screenshot OCR & search"},{"清理空文件夹","Empty folders"},{"查找重复文件","Duplicate files"},{"清理空文件","Empty files"},{"局域网 FTP","LAN FTP"},{"文章提炼","Article extractor"},{"视频转脚本","Video transcript"},{"媒体分类","Media sorter"},{"照片智能整理","Smart photos"},
-            {"开始扫描","Scan"},{"浏览","Browse"},{"等待扫描","Ready"},{"路径","Path"},{"修改时间","Modified"},{"将勾选项移入回收站","Move checked items to Recycle Bin"},
+            {"开始扫描","Scan"},{"浏览","Browse"},{"等待扫描","Ready"},{"路径","Path"},{"修改时间","Modified"},{"智能勾选","Smart select"},{"全选","Select all"},{"将勾选项移入回收站","Move checked items to Recycle Bin"},
             {"开始截图  Ctrl+Shift+A","Capture  Ctrl+Shift+A"},{"截图时隐藏客户端","Hide client window while capturing"},{"保存到本地","Save"},{"搜索图片","Image search"},
             {"启动服务","Start server"},{"停止服务","Stop server"},{"匿名访问","Anonymous"},{"允许上传","Allow uploads"},{"共享文件夹","Shared folder"},
             {"导入文档","Import"},{"按规则提炼","Extract"},{"复制结果","Copy"},{"自动判定体裁与复杂度","Automatic genre and complexity detection"},
@@ -79,7 +79,7 @@ namespace MuxiaToolbox
         static readonly Dictionary<string,string> Traditional = new Dictionary<string,string> {
             {"图片应用","圖片應用"},{"文件清理","檔案清理"},{"共享与提取","共享與擷取"},{"照片整理","照片整理"},
             {"截图识字与搜索","截圖識字與搜尋"},{"清理空文件夹","清理空資料夾"},{"查找重复文件","尋找重複檔案"},{"清理空文件","清理空檔案"},{"局域网 FTP","區域網路 FTP"},{"文章提炼","文章提煉"},{"视频转脚本","影片轉腳本"},{"媒体分类","媒體分類"},{"照片智能整理","照片智慧整理"},
-            {"开始扫描","開始掃描"},{"浏览","瀏覽"},{"等待扫描","等待掃描"},{"路径","路徑"},{"修改时间","修改時間"},{"将勾选项移入回收站","將勾選項移入資源回收筒"},
+            {"开始扫描","開始掃描"},{"浏览","瀏覽"},{"等待扫描","等待掃描"},{"路径","路徑"},{"修改时间","修改時間"},{"智能勾选","智慧勾選"},{"全选","全選"},{"将勾选项移入回收站","將勾選項移入資源回收筒"},
             {"开始截图  Ctrl+Shift+A","開始截圖  Ctrl+Shift+A"},{"截图时隐藏客户端","截圖時隱藏用戶端"},{"保存到本地","儲存到本機"},{"搜索图片","搜尋圖片"},
             {"启动服务","啟動服務"},{"停止服务","停止服務"},{"匿名访问","匿名存取"},{"允许上传","允許上傳"},{"共享文件夹","共享資料夾"},
             {"导入文档","匯入文件"},{"按规则提炼","依規則提煉"},{"复制结果","複製結果"},{"自动判定体裁与复杂度","自動判定體裁與複雜度"},

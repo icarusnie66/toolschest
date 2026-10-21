@@ -62,6 +62,27 @@ namespace MuxiaToolbox
             }
         }
 
+        static CheckBox AddSelectionControls(MainForm app, Panel work, ListView list, int smartX, Action smartSelect)
+        {
+            Button smart=app.Button("智能勾选",delegate{smartSelect();},false);
+            smart.Anchor=AnchorStyles.Bottom|AnchorStyles.Right;smart.Location=new Point(smartX,520);work.Controls.Add(smart);
+            CheckBox selectAll=new CheckBox{Text="全选",ThreeState=true,AutoCheck=false,AutoSize=true,ForeColor=app.TextColor,BackColor=app.Bg,Anchor=AnchorStyles.Bottom|AnchorStyles.Right,Location=new Point(smartX+120,531)};
+            bool syncing=false;
+            Action refresh=delegate{
+                if(syncing)return;syncing=true;
+                int total=list.Items.Count,checkedCount=list.Items.Cast<ListViewItem>().Count(i=>i.Checked);
+                selectAll.CheckState=total==0||checkedCount==0?CheckState.Unchecked:checkedCount==total?CheckState.Checked:CheckState.Indeterminate;
+                syncing=false;
+            };
+            selectAll.Click+=delegate{
+                syncing=true;bool check=selectAll.CheckState!=CheckState.Checked;
+                foreach(ListViewItem item in list.Items)item.Checked=check;
+                selectAll.CheckState=check?CheckState.Checked:CheckState.Unchecked;syncing=false;
+            };
+            list.ItemChecked+=delegate{if(!list.IsDisposed)list.BeginInvoke((Action)delegate{refresh();});};
+            list.HandleCreated+=delegate{refresh();};work.Controls.Add(selectAll);return selectAll;
+        }
+
         static Control FileCleanupPage(MainForm app, string key)
         {
             Panel work; Panel root = Base(app,key,out work); TextBox path = null;
@@ -70,6 +91,12 @@ namespace MuxiaToolbox
             Label status=app.Label("等待扫描",app.Settings.FontSize,false,app.Muted); status.Location=new Point(0,55); work.Controls.Add(status);
             ListView list=new ListView { Location=new Point(0,85),Size=new Size(1120,420),Anchor=AnchorStyles.Top|AnchorStyles.Bottom|AnchorStyles.Left|AnchorStyles.Right,View=View.Details,CheckBoxes=true,FullRowSelect=true,BackColor=app.Surface,ForeColor=app.TextColor };
             list.Columns.Add("路径",850); list.Columns.Add("修改时间",220); work.Controls.Add(list);
+            CheckBox selectAll=AddSelectionControls(app,work,list,690,delegate{
+                foreach(ListViewItem item in list.Items){
+                    try{FileAttributes attributes=File.GetAttributes(item.Text);item.Checked=(attributes&(FileAttributes.Hidden|FileAttributes.System|FileAttributes.ReadOnly))==0;}
+                    catch{item.Checked=false;}
+                }
+            });
             Button remove=app.Button("将勾选项移入回收站",delegate {
                 List<string> selected=list.Items.Cast<ListViewItem>().Where(x=>x.Checked).Select(x=>x.Text).ToList();
                 if(selected.Count==0){MessageBox.Show("请先勾选需要清理的项目。");return;}
@@ -83,7 +110,7 @@ namespace MuxiaToolbox
                     return SafeDirs(path.Text).Where(d=>{try{return !Directory.EnumerateFileSystemEntries(d).Any();}catch{return false;}}).ToList();
                 });
                 foreach(string f in found){DateTime t; try{t=key=="empty_files"?File.GetLastWriteTime(f):Directory.GetLastWriteTime(f);}catch{t=DateTime.MinValue;} list.Items.Add(new ListViewItem(new[]{f,t==DateTime.MinValue?"-":t.ToString("yyyy-MM-dd HH:mm")}));}
-                status.Text="扫描完成，共发现 "+found.Count+" 项。"; scan.Enabled=true;
+                selectAll.CheckState=CheckState.Unchecked;status.Text="扫描完成，共发现 "+found.Count+" 项。"; scan.Enabled=true;
             };
             return root;
         }
@@ -106,11 +133,11 @@ namespace MuxiaToolbox
             Label status=app.Label("按大小预筛选，再使用 SHA-256 内容哈希确认。",app.Settings.FontSize,false,app.Muted);status.Location=new Point(0,55);work.Controls.Add(status);
             ListView list=new ListView{Location=new Point(0,85),Size=new Size(1120,420),Anchor=AnchorStyles.Top|AnchorStyles.Bottom|AnchorStyles.Left|AnchorStyles.Right,View=View.Details,CheckBoxes=true,FullRowSelect=true,BackColor=app.Surface,ForeColor=app.TextColor};
             list.Columns.Add("重复组",80);list.Columns.Add("文件路径",780);list.Columns.Add("大小",100);list.Columns.Add("建议",100);work.Controls.Add(list);
-            Button auto=app.Button("自动勾选重复副本",delegate{foreach(ListViewItem i in list.Items)i.Checked=i.SubItems[3].Text=="可清理";},false);auto.Anchor=AnchorStyles.Bottom|AnchorStyles.Right;auto.Location=new Point(720,520);work.Controls.Add(auto);
+            CheckBox selectAll=AddSelectionControls(app,work,list,660,delegate{foreach(ListViewItem i in list.Items)i.Checked=i.SubItems[3].Text=="可清理";});
             Button remove=app.Button("将勾选项移入回收站",delegate{List<ListViewItem> items=list.Items.Cast<ListViewItem>().Where(i=>i.Checked).ToList();if(items.Count==0)return;if(MessageBox.Show("请确保每组至少保留一份。确定移入回收站吗？","确认",MessageBoxButtons.YesNo)!=DialogResult.Yes)return;Recycle(items.Select(i=>i.SubItems[1].Text),false);foreach(ListViewItem i in items)list.Items.Remove(i);},false);remove.Anchor=AnchorStyles.Bottom|AnchorStyles.Right;remove.Location=new Point(920,520);work.Controls.Add(remove);
             scan.Click+=async delegate{if(!Directory.Exists(path.Text)){MessageBox.Show("请选择有效位置。");return;}scan.Enabled=false;status.Text="正在计算哈希……";list.Items.Clear();
                 List<List<string>> groups=await Task.Run(delegate{return FileAlgorithms.FindDuplicates(path.Text);});
-                long bytes=0;int n=0;foreach(List<string> g in groups){n++;for(int i=0;i<g.Count;i++){long size=new FileInfo(g[i]).Length;if(i>0)bytes+=size;list.Items.Add(new ListViewItem(new[]{n.ToString(),g[i],HumanSize(size),i==0?"保留":"可清理"}));}}status.Text="发现 "+groups.Count+" 组，预计可释放 "+HumanSize(bytes)+"。";scan.Enabled=true;};return root;
+                long bytes=0;int n=0;foreach(List<string> g in groups){n++;for(int i=0;i<g.Count;i++){long size=new FileInfo(g[i]).Length;if(i>0)bytes+=size;list.Items.Add(new ListViewItem(new[]{n.ToString(),g[i],HumanSize(size),i==0?"保留":"可清理"}));}}selectAll.CheckState=CheckState.Unchecked;status.Text="发现 "+groups.Count+" 组，预计可释放 "+HumanSize(bytes)+"。";scan.Enabled=true;};return root;
         }
         static string HumanSize(long size){string[] u={"B","KB","MB","GB","TB"};double v=size;int i=0;while(v>=1024&&i<u.Length-1){v/=1024;i++;}return v.ToString("0.0")+" "+u[i];}
 
